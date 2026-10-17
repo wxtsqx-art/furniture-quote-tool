@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#244c3b">
+<title>家具报价计算器</title>
+<style>
+:root{--green:#244c3b;--green2:#347354;--bg:#f4f6f3;--card:#fff;--text:#202923;--muted:#66736b;--line:#dfe6e0;--gold:#e6b85c}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans SC",sans-serif;line-height:1.5}
+header{background:linear-gradient(135deg,var(--green),#386b50);color:#fff;padding:25px 18px 28px}
+.wrap{max-width:760px;margin:auto}header .eyebrow{font-size:12px;letter-spacing:2px;opacity:.8}h1{font-size:27px;margin:6px 0}header p{margin:5px 0 0;color:#e4eee7;font-size:14px}
+main{padding:16px 13px 40px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px;margin:0 0 14px;box-shadow:0 3px 12px #243c2b08}
+h2{font-size:17px;margin:0 0 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;font-size:13px;color:var(--muted);margin:0 0 5px}
+input,select,textarea{width:100%;border:1px solid #ccd7ce;border-radius:10px;padding:11px 10px;font-size:16px;background:#fff;color:var(--text);min-height:44px}
+input:focus,select:focus,textarea:focus{outline:2px solid #a5c8b1;border-color:var(--green2)}
+small.hint{display:block;color:var(--muted);font-size:12px;margin-top:5px}
+.results{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{padding:13px;background:#f1f6f2;border-radius:12px}.metric span{display:block;font-size:12px;color:var(--muted)}.metric strong{font-size:21px;color:var(--green);overflow-wrap:anywhere}.metric.primary{background:var(--green);grid-column:1/-1}.metric.primary span,.metric.primary strong{color:#fff}.metric.primary strong{font-size:30px}
+button{border:0;border-radius:11px;padding:12px 14px;font-size:15px;font-weight:650;cursor:pointer;min-height:45px}.btn-main{background:var(--green);color:#fff;width:100%}.btn-secondary{background:#edf3ee;color:var(--green);border:1px solid #d5e1d7}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
+.quote{white-space:pre-wrap;background:#f8faf8;border:1px dashed #cbd8ce;padding:13px;border-radius:10px;font-size:14px;overflow-wrap:anywhere}
+footer{text-align:center;color:var(--muted);font-size:12px;padding:0 15px 28px}
+@media(min-width:600px){main{padding-top:22px}.card{padding:21px}.grid{grid-template-columns:repeat(3,1fr)}.field.full{grid-column:1/-1}}
+</style>
+</head>
+<body>
+<header><div class="wrap"><div class="eyebrow">FURNITURE · QUOTATION TOOL</div><h1>🪵 家具报价计算器</h1><p>快速估算材料、人工与利润，生成可复制的报价单。</p></div></header>
+<main class="wrap">
+<section class="card">
+<h2>01 · 项目信息</h2>
+<div class="grid">
+<div class="field full"><label for="name">家具 / 项目名称</label><input id="name" placeholder="例如：两门衣柜" value="定制家具"></div>
+<div class="field"><label for="width">宽度（mm，可选）</label><input id="width" type="number" min="0" placeholder="例如 1800"></div>
+<div class="field"><label for="height">高度（mm，可选）</label><input id="height" type="number" min="0" placeholder="例如 2200"></div>
+<div class="field"><label for="depth">深度（mm，可选）</label><input id="depth" type="number" min="0" placeholder="例如 600"></div>
+<div class="field"><label for="quantity">数量（件）</label><input id="quantity" type="number" min="1" step="1" value="1"></div>
+<div class="field"><label for="currency">货币单位</label><select id="currency"><option value="¥">人民币（¥）</option><option value="$">美元（$）</option><option value="元">元（不带符号）</option></select></div>
+</div>
+</section>
+<section class="card">
+<h2>02 · 成本与报价参数</h2>
+<div class="grid">
+<div class="field"><label for="board">板材成本（每件）</label><input id="board" type="number" min="0" step="0.01" value="800"></div>
+<div class="field"><label for="hardware">五金成本（每件）</label><input id="hardware" type="number" min="0" step="0.01" value="200"></div>
+<div class="field"><label for="other">其他材料成本（每件）</label><input id="other" type="number" min="0" step="0.01" value="100"></div>
+<div class="field"><label for="labor">人工成本（每件）</label><input id="labor" type="number" min="0" step="0.01" value="300"></div>
+<div class="field"><label for="transport">运输 / 安装（每件）</label><input id="transport" type="number" min="0" step="0.01" value="100"></div>
+<div class="field"><label for="waste">损耗率（%）</label><input id="waste" type="number" min="0" max="100" step="0.1" value="5"></div>
+<div class="field"><label for="profit">目标利润率（%）</label><input id="profit" type="number" min="0" max="99.9" step="0.1" value="25"></div>
+<div class="field"><label for="discount">折扣（%）</label><input id="discount" type="number" min="0" max="100" step="0.1" value="0"></div>
+<div class="field"><label for="extra">额外费用（整个订单）</label><input id="extra" type="number" min="0" step="0.01" value="0"></div>
+</div>
+<small class="hint">利润率按“利润 ÷ 售价”计算；损耗率只加在板材及其他材料成本上。所有数字请按你的实际情况填写。</small>
+</section>
+<section class="card">
+<h2>03 · 计算结果</h2>
+<div class="results">
+<div class="metric"><span>单件基础成本（含损耗）</span><strong id="unitCost">¥1,000.00</strong></div>
+<div class="metric"><span>订单总成本（含额外费用）</span><strong id="totalCost">¥1,500.00</strong></div>
+<div class="metric"><span>折扣前建议单价</span><strong id="unitPrice">¥2,000.00</strong></div>
+<div class="metric"><span>预计订单利润</span><strong id="profitValue">¥0.00</strong></div>
+<div class="metric primary"><span>折扣后订单报价</span><strong id="finalPrice">¥0.00</strong></div>
+</div>
+<div class="actions"><button class="btn-secondary" id="reset">恢复示例数据</button><button class="btn-main" id="makeQuote">生成报价单</button></div>
+</section>
+<section class="card" id="quoteCard" hidden>
+<h2>04 · 报价单（可复制）</h2>
+<div class="quote" id="quoteText"></div>
+<div class="actions"><button class="btn-secondary" id="copyQuote">复制报价单</button><button class="btn-secondary" id="shareQuote">分享 / 保存</button></div>
+<small class="hint" id="copyHint" aria-live="polite"></small>
+</section>
+</main>
+<footer class="wrap">本工具用于辅助估算，不构成正式报价或财务建议。请核对材料价格、税费、运输及实际工艺成本。</footer>
+<script>
+const ids=['name','width','height','depth','quantity','currency','board','hardware','other','labor','transport','waste','profit','discount','extra'];
+const $=id=>document.getElementById(id);
+const num=id=>{const v=Number($(id).value);return Number.isFinite(v)?Math.max(0,v):0};
+const money=n=>$( 'currency').value+(Number.isFinite(n)?n:0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
+function calculate(){
+ const qty=Math.max(1,Math.floor(num('quantity'))), waste=Math.min(100,num('waste'))/100, margin=Math.min(99.9,num('profit'))/100, discount=Math.min(100,num('discount'))/100;
+ const materials=(num('board')+num('other'))*(1+waste)+num('hardware');
+ const unitCost=materials+num('labor')+num('transport');
+ const totalCost=unitCost*qty+num('extra');
+ const unitPrice=margin<1?unitCost/(1-margin):unitCost;
+ const beforeDiscount=unitPrice*qty+num('extra')/(1-margin);
+ const finalPrice=beforeDiscount*(1-discount);
+ const profitValue=finalPrice-totalCost;
+ $('unitCost').textContent=money(unitCost);$('totalCost').textContent=money(totalCost);$('unitPrice').textContent=money(unitPrice);$('profitValue').textContent=money(profitValue);$('finalPrice').textContent=money(finalPrice);
+ return {qty,unitCost,totalCost,unitPrice,beforeDiscount,finalPrice,profitValue};
+}
+function makeQuote(){
+ const r=calculate(), dims=['width','height','depth'].map(id=>$(id).value.trim()||'—').join(' × ');
+ const text=`家具报价单\n项目名称：${$('name').value.trim()||'未命名项目'}\n尺寸（宽×高×深，mm）：${dims}\n数量：${r.qty} 件\n\n单件成本（含损耗）：${money(r.unitCost)}\n订单总成本（含额外费用）：${money(r.totalCost)}\n折扣前参考报价：${money(r.beforeDiscount)}\n折扣：${num('discount')}%\n折扣后订单报价：${money(r.finalPrice)}\n预计利润：${money(r.profitValue)}\n\n说明：此为估算报价，请以实际测量、材料价格、工艺、税费和运输条件为准。`;
+ $('quoteText').textContent=text;$('quoteCard').hidden=false;$('copyHint').textContent='';
+}
+ids.forEach(id=>$(id).addEventListener('input',calculate));
+$('makeQuote').addEventListener('click',makeQuote);
+$('reset').addEventListener('click',()=>{const defaults={name:'定制家具',width:'',height:'',depth:'',quantity:'1',currency:'¥',board:'800',hardware:'200',other:'100',labor:'300',transport:'100',waste:'5',profit:'25',discount:'0',extra:'0'};Object.entries(defaults).forEach(([k,v])=>$(k).value=v);calculate();$('quoteCard').hidden=true;});
+$('copyQuote').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('quoteText').textContent);$('copyHint').textContent='已复制报价单。';}catch(e){$('copyHint').textContent='浏览器不允许自动复制，请长按报价文字手动复制。';}});
+$('shareQuote').addEventListener('click',async()=>{const text=$('quoteText').textContent;try{if(navigator.share)await navigator.share({title:'家具报价单',text});else{await navigator.clipboard.writeText(text);$('copyHint').textContent='已复制内容，可粘贴到聊天或备忘录。';}}catch(e){$('copyHint').textContent='未打开分享菜单，你可以手动复制报价内容。';}});
+calculate();
+</script>
+</body>
+</html>
