@@ -1,103 +1,661 @@
+
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="theme-color" content="#244c3b">
+<meta name="theme-color" content="#173f35">
 <title>家具报价计算器</title>
 <style>
-:root{--green:#244c3b;--green2:#347354;--bg:#f4f6f3;--card:#fff;--text:#202923;--muted:#66736b;--line:#dfe6e0;--gold:#e6b85c}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,"Noto Sans SC",sans-serif;line-height:1.5}
-header{background:linear-gradient(135deg,var(--green),#386b50);color:#fff;padding:25px 18px 28px}
-.wrap{max-width:760px;margin:auto}header .eyebrow{font-size:12px;letter-spacing:2px;opacity:.8}h1{font-size:27px;margin:6px 0}header p{margin:5px 0 0;color:#e4eee7;font-size:14px}
-main{padding:16px 13px 40px}.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:17px;margin:0 0 14px;box-shadow:0 3px 12px #243c2b08}
-h2{font-size:17px;margin:0 0 14px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}.field{min-width:0}.field.full{grid-column:1/-1}label{display:block;font-size:13px;color:var(--muted);margin:0 0 5px}
-input,select,textarea{width:100%;border:1px solid #ccd7ce;border-radius:10px;padding:11px 10px;font-size:16px;background:#fff;color:var(--text);min-height:44px}
-input:focus,select:focus,textarea:focus{outline:2px solid #a5c8b1;border-color:var(--green2)}
-small.hint{display:block;color:var(--muted);font-size:12px;margin-top:5px}
-.results{display:grid;grid-template-columns:1fr 1fr;gap:10px}.metric{padding:13px;background:#f1f6f2;border-radius:12px}.metric span{display:block;font-size:12px;color:var(--muted)}.metric strong{font-size:21px;color:var(--green);overflow-wrap:anywhere}.metric.primary{background:var(--green);grid-column:1/-1}.metric.primary span,.metric.primary strong{color:#fff}.metric.primary strong{font-size:30px}
-button{border:0;border-radius:11px;padding:12px 14px;font-size:15px;font-weight:650;cursor:pointer;min-height:45px}.btn-main{background:var(--green);color:#fff;width:100%}.btn-secondary{background:#edf3ee;color:var(--green);border:1px solid #d5e1d7}.actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}
-.quote{white-space:pre-wrap;background:#f8faf8;border:1px dashed #cbd8ce;padding:13px;border-radius:10px;font-size:14px;overflow-wrap:anywhere}
-footer{text-align:center;color:var(--muted);font-size:12px;padding:0 15px 28px}
-@media(min-width:600px){main{padding-top:22px}.card{padding:21px}.grid{grid-template-columns:repeat(3,1fr)}.field.full{grid-column:1/-1}}
+:root {
+  --green: #173f35;
+  --green2: #245747;
+  --bg: #f3f5f2;
+  --card: #ffffff;
+  --text: #202923;
+  --muted: #6b756e;
+  --border: #dce4dc;
+  --danger: #b42318;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font-family: system-ui, -apple-system, "Noto Sans SC", sans-serif;
+  font-size: 15px;
+}
+header {
+  padding: 25px 18px;
+  background: var(--green);
+  color: white;
+}
+header h1 { margin: 0 0 7px; font-size: 25px; }
+header p { margin: 0; color: #d9e8df; font-size: 13px; }
+main { max-width: 850px; margin: auto; padding: 16px; }
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 15px;
+  padding: 17px;
+  margin-bottom: 15px;
+}
+h2 { font-size: 18px; margin: 0 0 15px; }
+.grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 13px;
+}
+.field { min-width: 0; }
+.full { grid-column: 1 / -1; }
+label {
+  display: block;
+  font-size: 13px;
+  font-weight: 650;
+  margin-bottom: 6px;
+}
+input, select, textarea {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #cbd5cc;
+  border-radius: 9px;
+  background: white;
+  color: var(--text);
+  font: inherit;
+}
+input:focus, select:focus, textarea:focus {
+  outline: 2px solid #83b8a1;
+  border-color: var(--green2);
+}
+.hint { color: var(--muted); font-size: 12px; margin-top: 5px; }
+button {
+  padding: 11px 14px;
+  border: 0;
+  border-radius: 9px;
+  background: var(--green);
+  color: white;
+  font: inherit;
+  font-weight: 650;
+  cursor: pointer;
+}
+button.secondary { background: #e8eee9; color: var(--green); }
+button.danger { background: #fff0ee; color: var(--danger); }
+button:active { opacity: .8; }
+.actions { display: flex; flex-wrap: wrap; gap: 9px; }
+.result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+.metric {
+  background: #f2f6f2;
+  padding: 13px;
+  border-radius: 10px;
+  min-width: 0;
+}
+.metric .name { color: var(--muted); font-size: 12px; }
+.metric .value {
+  margin-top: 6px;
+  font-size: 20px;
+  font-weight: 750;
+  overflow-wrap: anywhere;
+}
+.metric.primary {
+  background: var(--green);
+  color: white;
+}
+.metric.primary .name { color: #d9e8df; }
+.metric.primary .value { font-size: 25px; }
+.history-item {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 13px;
+  margin-top: 10px;
+}
+.history-item h3 { font-size: 15px; margin: 0 0 6px; }
+.history-item p { margin: 4px 0; color: var(--muted); font-size: 13px; }
+.history-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.empty { color: var(--muted); font-size: 13px; }
+footer { text-align: center; padding: 8px 16px 28px; color: var(--muted); font-size: 12px; }
+hr { border: 0; border-top: 1px solid var(--border); margin: 15px 0; }
+@media (max-width: 430px) {
+  main { padding: 11px; }
+  .card { padding: 14px; }
+  .grid { gap: 11px; }
+  .metric .value { font-size: 18px; }
+  header h1 { font-size: 22px; }
+}
+@media print {
+  body { background: white; }
+  header { background: white; color: black; padding: 10px 0; }
+  header p, .no-print, #historyCard, footer { display: none !important; }
+  main { max-width: none; padding: 0; }
+  .card { break-inside: avoid; border-color: #ccc; }
+  input, select { border: 0; padding: 2px; }
+}
 </style>
 </head>
 <body>
-<header><div class="wrap"><div class="eyebrow">FURNITURE · QUOTATION TOOL</div><h1>🪵 家具报价计算器</h1><p>快速估算材料、人工与利润，生成可复制的报价单。</p></div></header>
-<main class="wrap">
-<section class="card">
-<h2>01 · 项目信息</h2>
-<div class="grid">
-<div class="field full"><label for="name">家具 / 项目名称</label><input id="name" placeholder="例如：两门衣柜" value="定制家具"></div>
-<div class="field"><label for="width">宽度（mm，可选）</label><input id="width" type="number" min="0" placeholder="例如 1800"></div>
-<div class="field"><label for="height">高度（mm，可选）</label><input id="height" type="number" min="0" placeholder="例如 2200"></div>
-<div class="field"><label for="depth">深度（mm，可选）</label><input id="depth" type="number" min="0" placeholder="例如 600"></div>
-<div class="field"><label for="quantity">数量（件）</label><input id="quantity" type="number" min="1" step="1" value="1"></div>
-<div class="field"><label for="currency">货币单位</label><select id="currency"><option value="¥">人民币（¥）</option><option value="$">美元（$）</option><option value="元">元（不带符号）</option></select></div>
-</div>
-</section>
-<section class="card">
-<h2>02 · 成本与报价参数</h2>
-<div class="grid">
-<div class="field"><label for="board">板材成本（每件）</label><input id="board" type="number" min="0" step="0.01" value="800"></div>
-<div class="field"><label for="hardware">五金成本（每件）</label><input id="hardware" type="number" min="0" step="0.01" value="200"></div>
-<div class="field"><label for="other">其他材料成本（每件）</label><input id="other" type="number" min="0" step="0.01" value="100"></div>
-<div class="field"><label for="labor">人工成本（每件）</label><input id="labor" type="number" min="0" step="0.01" value="300"></div>
-<div class="field"><label for="transport">运输 / 安装（每件）</label><input id="transport" type="number" min="0" step="0.01" value="100"></div>
-<div class="field"><label for="waste">损耗率（%）</label><input id="waste" type="number" min="0" max="100" step="0.1" value="5"></div>
-<div class="field"><label for="profit">目标利润率（%）</label><input id="profit" type="number" min="0" max="99.9" step="0.1" value="25"></div>
-<div class="field"><label for="discount">折扣（%）</label><input id="discount" type="number" min="0" max="100" step="0.1" value="0"></div>
-<div class="field"><label for="extra">额外费用（整个订单）</label><input id="extra" type="number" min="0" step="0.01" value="0"></div>
-</div>
-<small class="hint">利润率按“利润 ÷ 售价”计算；损耗率只加在板材及其他材料成本上。所有数字请按你的实际情况填写。</small>
-</section>
-<section class="card">
-<h2>03 · 计算结果</h2>
-<div class="results">
-<div class="metric"><span>单件基础成本（含损耗）</span><strong id="unitCost">¥1,000.00</strong></div>
-<div class="metric"><span>订单总成本（含额外费用）</span><strong id="totalCost">¥1,500.00</strong></div>
-<div class="metric"><span>折扣前建议单价</span><strong id="unitPrice">¥2,000.00</strong></div>
-<div class="metric"><span>预计订单利润</span><strong id="profitValue">¥0.00</strong></div>
-<div class="metric primary"><span>折扣后订单报价</span><strong id="finalPrice">¥0.00</strong></div>
-</div>
-<div class="actions"><button class="btn-secondary" id="reset">恢复示例数据</button><button class="btn-main" id="makeQuote">生成报价单</button></div>
-</section>
-<section class="card" id="quoteCard" hidden>
-<h2>04 · 报价单（可复制）</h2>
-<div class="quote" id="quoteText"></div>
-<div class="actions"><button class="btn-secondary" id="copyQuote">复制报价单</button><button class="btn-secondary" id="shareQuote">分享 / 保存</button></div>
-<small class="hint" id="copyHint" aria-live="polite"></small>
-</section>
+<header>
+  <h1>家具报价计算器</h1>
+  <p>家具成本核算 · 报价单 · 历史记录</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>一、项目与尺寸</h2>
+    <div class="grid">
+      <div class="field full">
+        <label for="name">家具 / 项目名称</label>
+        <input id="name" value="定制家具" placeholder="例如：两门衣柜">
+      </div>
+      <div class="field">
+        <label for="width">宽度（cm，可选）</label>
+        <input id="width" type="number" min="0" step="any" placeholder="例如 180">
+      </div>
+      <div class="field">
+        <label for="height">高度（cm，可选）</label>
+        <input id="height" type="number" min="0" step="any" placeholder="例如 220">
+      </div>
+      <div class="field">
+        <label for="depth">深度（cm，可选）</label>
+        <input id="depth" type="number" min="0" step="any" placeholder="例如 60">
+      </div>
+      <div class="field">
+        <label for="quantity">数量（件）</label>
+        <input id="quantity" type="number" min="1" step="1" value="1">
+      </div>
+      <div class="field full">
+        <label for="currency">货币单位</label>
+        <select id="currency">
+          <option value="¥">人民币（¥）</option>
+          <option value="$">美元（$）</option>
+          <option value="元">元（不带符号）</option>
+        </select>
+      </div>
+    </div>
+    <p class="hint">尺寸仅用于记录。此版本不会自动根据尺寸推算板材用量。</p>
+  </section>
+
+  <section class="card">
+    <h2>二、单件成本与订单费用</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="board">单件板材费用</label>
+        <input id="board" type="number" min="0" step="any" value="0">
+      </div>
+      <div class="field">
+        <label for="hardware">单件五金费用</label>
+        <input id="hardware" type="number" min="0" step="any" value="0">
+      </div>
+      <div class="field">
+        <label for="other">单件其他材料费</label>
+        <input id="other" type="number" min="0" step="any" value="0">
+      </div>
+      <div class="field">
+        <label for="labor">单件人工费</label>
+        <input id="labor" type="number" min="0" step="any" value="0">
+      </div>
+      <div class="field">
+        <label for="transport">订单运输安装费</label>
+        <input id="transport" type="number" min="0" step="any" value="0">
+      </div>
+      <div class="field">
+        <label for="extra">订单其他费用</label>
+        <input id="extra" type="number" min="0" step="any" value="0">
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>三、损耗、利润与折扣</h2>
+    <div class="grid">
+      <div class="field">
+        <label for="waste">材料损耗率（%）</label>
+        <input id="waste" type="number" min="0" max="100" step="any" value="5">
+      </div>
+      <div class="field">
+        <label for="profit">利润率（%）</label>
+        <input id="profit" type="number" min="0" max="1000" step="any" value="30">
+        <p class="hint">按成本加成计算，不是销售额利润率。</p>
+      </div>
+      <div class="field full">
+        <label for="discount">折扣（%）</label>
+        <input id="discount" type="number" min="0" max="100" step="any" value="0">
+        <p class="hint">例如填写 10，表示优惠 10%。</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
+    <h2>四、报价结果</h2>
+    <div class="result-grid">
+      <div class="metric">
+        <div class="name">单件成本（含分摊费用）</div>
+        <div class="value" id="unitCost">¥0.00</div>
+      </div>
+      <div class="metric">
+        <div class="name">订单总成本</div>
+        <div class="value" id="totalCost">¥0.00</div>
+      </div>
+      <div class="metric">
+        <div class="name">折扣前单价</div>
+        <div class="value" id="unitPrice">¥0.00</div>
+      </div>
+      <div class="metric">
+        <div class="name">预计利润（折扣前）</div>
+        <div class="value" id="profitAmount">¥0.00</div>
+      </div>
+      <div class="metric primary full">
+        <div class="name">折扣后订单报价</div>
+        <div class="value" id="finalTotal">¥0.00</div>
+      </div>
+      <div class="metric full">
+        <div class="name">折扣后预计利润</div>
+        <div class="value" id="finalProfit">¥0.00</div>
+      </div>
+    </div>
+    <p class="hint" id="calcNote">输入费用后，报价会自动更新。</p>
+    <hr>
+    <div class="actions no-print">
+      <button id="saveBtn">保存报价记录</button>
+      <button id="quoteBtn" class="secondary">生成报价单</button>
+      <button id="copyBtn" class="secondary">复制报价</button>
+      <button id="printBtn" class="secondary">打印 / 保存 PDF</button>
+    </div>
+  </section>
+
+  <section class="card" id="quoteCard" hidden>
+    <h2>报价单</h2>
+    <div id="quoteContent"></div>
+  </section>
+
+  <section class="card" id="historyCard">
+    <h2>五、历史报价记录</h2>
+    <p class="hint">记录保存在当前浏览器中。清除浏览器网站数据或更换设备可能导致记录丢失。</p>
+    <div class="actions no-print">
+      <button id="exportBtn" class="secondary">导出备份</button>
+      <button id="importBtn" class="secondary">导入备份</button>
+      <button id="clearBtn" class="danger">清空记录</button>
+      <input id="backupFile" type="file" accept=".json,application/json" hidden>
+    </div>
+    <div id="historyList"><p class="empty">暂时没有保存的报价。</p></div>
+  </section>
 </main>
-<footer class="wrap">本工具用于辅助估算，不构成正式报价或财务建议。请核对材料价格、税费、运输及实际工艺成本。</footer>
+
+<footer>家具报价计算器 · 请在正式报价前核对材料成本与计算结果</footer>
+
 <script>
-const ids=['name','width','height','depth','quantity','currency','board','hardware','other','labor','transport','waste','profit','discount','extra'];
-const $=id=>document.getElementById(id);
-const num=id=>{const v=Number($(id).value);return Number.isFinite(v)?Math.max(0,v):0};
-const money=n=>$( 'currency').value+(Number.isFinite(n)?n:0).toLocaleString('zh-CN',{minimumFractionDigits:2,maximumFractionDigits:2});
-function calculate(){
- const qty=Math.max(1,Math.floor(num('quantity'))), waste=Math.min(100,num('waste'))/100, margin=Math.min(99.9,num('profit'))/100, discount=Math.min(100,num('discount'))/100;
- const materials=(num('board')+num('other'))*(1+waste)+num('hardware');
- const unitCost=materials+num('labor')+num('transport');
- const totalCost=unitCost*qty+num('extra');
- const unitPrice=margin<1?unitCost/(1-margin):unitCost;
- const beforeDiscount=unitPrice*qty+num('extra')/(1-margin);
- const finalPrice=beforeDiscount*(1-discount);
- const profitValue=finalPrice-totalCost;
- $('unitCost').textContent=money(unitCost);$('totalCost').textContent=money(totalCost);$('unitPrice').textContent=money(unitPrice);$('profitValue').textContent=money(profitValue);$('finalPrice').textContent=money(finalPrice);
- return {qty,unitCost,totalCost,unitPrice,beforeDiscount,finalPrice,profitValue};
+"use strict";
+
+const $ = id => document.getElementById(id);
+const STORAGE_KEY = "furnitureQuoteHistory_v1";
+let lastCalculation = null;
+
+const inputIds = [
+  "name", "width", "height", "depth", "quantity", "currency",
+  "board", "hardware", "other", "labor", "transport", "extra",
+  "waste", "profit", "discount"
+];
+
+function readNumber(id, fallback = 0) {
+  const value = $(id).value.trim();
+  if (value === "") return fallback;
+  const number = Number(value);
+  return Number.isFinite(number) ? number : NaN;
 }
-function makeQuote(){
- const r=calculate(), dims=['width','height','depth'].map(id=>$(id).value.trim()||'—').join(' × ');
- const text=`家具报价单\n项目名称：${$('name').value.trim()||'未命名项目'}\n尺寸（宽×高×深，mm）：${dims}\n数量：${r.qty} 件\n\n单件成本（含损耗）：${money(r.unitCost)}\n订单总成本（含额外费用）：${money(r.totalCost)}\n折扣前参考报价：${money(r.beforeDiscount)}\n折扣：${num('discount')}%\n折扣后订单报价：${money(r.finalPrice)}\n预计利润：${money(r.profitValue)}\n\n说明：此为估算报价，请以实际测量、材料价格、工艺、税费和运输条件为准。`;
- $('quoteText').textContent=text;$('quoteCard').hidden=false;$('copyHint').textContent='';
+
+function money(value, currency) {
+  const safe = Number.isFinite(value) ? value : 0;
+  return currency + safe.toLocaleString("zh-CN", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2
+  });
 }
-ids.forEach(id=>$(id).addEventListener('input',calculate));
-$('makeQuote').addEventListener('click',makeQuote);
-$('reset').addEventListener('click',()=>{const defaults={name:'定制家具',width:'',height:'',depth:'',quantity:'1',currency:'¥',board:'800',hardware:'200',other:'100',labor:'300',transport:'100',waste:'5',profit:'25',discount:'0',extra:'0'};Object.entries(defaults).forEach(([k,v])=>$(k).value=v);calculate();$('quoteCard').hidden=true;});
-$('copyQuote').addEventListener('click',async()=>{try{await navigator.clipboard.writeText($('quoteText').textContent);$('copyHint').textContent='已复制报价单。';}catch(e){$('copyHint').textContent='浏览器不允许自动复制，请长按报价文字手动复制。';}});
-$('shareQuote').addEventListener('click',async()=>{const text=$('quoteText').textContent;try{if(navigator.share)await navigator.share({title:'家具报价单',text});else{await navigator.clipboard.writeText(text);$('copyHint').textContent='已复制内容，可粘贴到聊天或备忘录。';}}catch(e){$('copyHint').textContent='未打开分享菜单，你可以手动复制报价内容。';}});
+
+function getFormData() {
+  const data = {};
+  for (const id of inputIds) {
+    data[id] = $(id).value;
+  }
+  return data;
+}
+
+function setFormData(data) {
+  for (const id of inputIds) {
+    if (data[id] !== undefined && $(id)) {
+      $(id).value = data[id];
+    }
+  }
+  calculate();
+}
+
+function calculate() {
+  const currency = $("currency").value;
+  const quantity = readNumber("quantity", 1);
+  const board = readNumber("board");
+  const hardware = readNumber("hardware");
+  const other = readNumber("other");
+  const labor = readNumber("labor");
+  const transport = readNumber("transport");
+  const extra = readNumber("extra");
+  const waste = readNumber("waste");
+  const profitRate = readNumber("profit");
+  const discount = readNumber("discount");
+
+  const numbers = [
+    quantity, board, hardware, other, labor, transport, extra,
+    waste, profitRate, discount
+  ];
+
+  if (numbers.some(n => !Number.isFinite(n))) {
+    $("calcNote").textContent = "请检查输入：金额和比例必须是有效数字。";
+    return null;
+  }
+
+  if (quantity < 1 || !Number.isInteger(quantity)) {
+    $("calcNote").textContent = "数量必须是大于或等于 1 的整数。";
+    return null;
+  }
+
+  if ([board, hardware, other, labor, transport, extra].some(n => n < 0)) {
+    $("calcNote").textContent = "费用不能小于 0。";
+    return null;
+  }
+
+  if (waste < 0 || waste > 100 ||
+      profitRate < 0 || profitRate > 1000 ||
+      discount < 0 || discount > 100) {
+    $("calcNote").textContent = "请检查损耗率、利润率和折扣范围。";
+    return null;
+  }
+
+  const basePerItem = board + hardware + other + labor;
+  const wasteCostPerItem = (board + hardware + other) * waste / 100;
+  const productionPerItem = basePerItem + wasteCostPerItem;
+  const orderFees = transport + extra;
+  const totalCost = productionPerItem * quantity + orderFees;
+  const unitCost = totalCost / quantity;
+  const unitPrice = unitCost * (1 + profitRate / 100);
+  const beforeDiscount = unitPrice * quantity;
+  const profitAmount = beforeDiscount - totalCost;
+  const finalTotal = beforeDiscount * (1 - discount / 100);
+  const finalProfit = finalTotal - totalCost;
+
+  const result = {
+    currency, quantity, basePerItem, wasteCostPerItem,
+    productionPerItem, orderFees, unitCost, totalCost,
+    unitPrice, beforeDiscount, profitAmount, discount,
+    finalTotal, finalProfit,
+    name: $("name").value.trim() || "未命名项目",
+    width: $("width").value,
+    height: $("height").value,
+    depth: $("depth").value
+  };
+
+  lastCalculation = result;
+  $("unitCost").textContent = money(unitCost, currency);
+  $("totalCost").textContent = money(totalCost, currency);
+  $("unitPrice").textContent = money(unitPrice, currency);
+  $("profitAmount").textContent = money(profitAmount, currency);
+  $("finalTotal").textContent = money(finalTotal, currency);
+  $("finalProfit").textContent = money(finalProfit, currency);
+  $("calcNote").textContent =
+    "材料损耗仅按板材、五金和其他材料费估算；运输安装及其他订单费用不计损耗。";
+  return result;
+}
+
+function makeQuoteText(r) {
+  const dimensions = [
+    r.width ? "宽 " + r.width + " cm" : "",
+    r.height ? "高 " + r.height + " cm" : "",
+    r.depth ? "深 " + r.depth + " cm" : ""
+  ].filter(Boolean).join(" × ") || "未填写";
+
+  return [
+    "家具报价单",
+    "项目名称：" + r.name,
+    "尺寸：" + dimensions,
+    "数量：" + r.quantity + " 件",
+    "单件成本：" + money(r.unitCost, r.currency),
+    "订单总成本：" + money(r.totalCost, r.currency),
+    "折扣前单价：" + money(r.unitPrice, r.currency),
+    "折扣前订单金额：" + money(r.beforeDiscount, r.currency),
+    "折扣：" + r.discount + "%",
+    "折扣后总报价：" + money(r.finalTotal, r.currency),
+    "折扣后预计利润：" + money(r.finalProfit, r.currency),
+    "生成时间：" + new Date().toLocaleString("zh-CN"),
+    "备注：此报价为估算结果，最终价格以双方确认内容为准。"
+  ].join("\n");
+}
+
+function showQuote(r) {
+  const dimensions = [
+    r.width ? "宽 " + r.width + " cm" : "",
+    r.height ? "高 " + r.height + " cm" : "",
+    r.depth ? "深 " + r.depth + " cm" : ""
+  ].filter(Boolean).join(" × ") || "未填写";
+
+  const rows = [
+    ["项目名称", r.name],
+    ["尺寸", dimensions],
+    ["数量", r.quantity + " 件"],
+    ["单件成本", money(r.unitCost, r.currency)],
+    ["订单总成本", money(r.totalCost, r.currency)],
+    ["折扣前单价", money(r.unitPrice, r.currency)],
+    ["折扣", r.discount + "%"],
+    ["折扣后订单报价", money(r.finalTotal, r.currency)],
+    ["折扣后预计利润", money(r.finalProfit, r.currency)]
+  ];
+
+  const container = $("quoteContent");
+  container.replaceChildren();
+
+  for (const [label, value] of rows) {
+    const p = document.createElement("p");
+    const strong = document.createElement("strong");
+    strong.textContent = label + "：";
+    p.append(strong, document.createTextNode(value));
+    container.appendChild(p);
+  }
+
+  const time = document.createElement("p");
+  time.textContent = "生成时间：" + new Date().toLocaleString("zh-CN");
+  container.appendChild(time);
+  $("quoteCard").hidden = false;
+}
+
+function readHistory() {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]");
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (error) {
+    return [];
+  }
+}
+
+function writeHistory(history) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(history));
+    return true;
+  } catch (error) {
+    alert("保存失败：浏览器可能禁止了本地存储，或存储空间不足。请先导出备份或检查浏览器设置。");
+    return false;
+  }
+}
+
+function saveQuote() {
+  const r = calculate();
+  if (!r) {
+    alert("请先修正输入内容，再保存报价。");
+    return;
+  }
+
+  const history = readHistory();
+  history.unshift({
+    id: Date.now().toString() + Math.random().toString(16).slice(2),
+    savedAt: new Date().toISOString(),
+    form: getFormData(),
+    result: r
+  });
+
+  if (writeHistory(history)) {
+    renderHistory();
+    alert("报价已保存到当前浏览器。");
+  }
+}
+
+function renderHistory() {
+  const list = $("historyList");
+  list.replaceChildren();
+  const history = readHistory();
+
+  if (history.length === 0) {
+    const p = document.createElement("p");
+    p.className = "empty";
+    p.textContent = "暂时没有保存的报价。";
+    list.appendChild(p);
+    return;
+  }
+
+  for (const item of history) {
+    const card = document.createElement("div");
+    card.className = "history-item";
+
+    const heading = document.createElement("h3");
+    heading.textContent = item.result.name || "未命名项目";
+    card.appendChild(heading);
+
+    const date = document.createElement("p");
+    date.textContent = "保存时间：" +
+      new Date(item.savedAt).toLocaleString("zh-CN");
+    card.appendChild(date);
+
+    const amount = document.createElement("p");
+    amount.textContent = "折扣后报价：" +
+      money(item.result.finalTotal, item.result.currency);
+    card.appendChild(amount);
+
+    const qty = document.createElement("p");
+    qty.textContent = "数量：" + item.result.quantity + " 件";
+    card.appendChild(qty);
+
+    const actions = document.createElement("div");
+    actions.className = "history-actions no-print";
+
+    const loadBtn = document.createElement("button");
+    loadBtn.className = "secondary";
+    loadBtn.textContent = "载入报价";
+    loadBtn.addEventListener("click", () => {
+      if (!item.form) return;
+      setFormData(item.form);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+
+    const copyBtn = document.createElement("button");
+    copyBtn.className = "secondary";
+    copyBtn.textContent = "复制报价";
+    copyBtn.addEventListener("click", () => copyText(makeQuoteText(item.result)));
+
+    const deleteBtn = document.createElement("button");
+    deleteBtn.className = "danger";
+    deleteBtn.textContent = "删除";
+    deleteBtn.addEventListener("click", () => {
+      if (!confirm("确定删除这条报价记录吗？")) return;
+      const updated = readHistory().filter(x => x.id !== item.id);
+      if (writeHistory(updated)) renderHistory();
+    });
+
+    actions.append(loadBtn, copyBtn, deleteBtn);
+    card.appendChild(actions);
+    list.appendChild(card);
+  }
+}
+
+async function copyText(text) {
+  try {
+    await navigator.clipboard.writeText(text);
+    alert("已复制报价内容。");
+  } catch (error) {
+    const area = document.createElement("textarea");
+    area.value = text;
+    document.body.appendChild(area);
+    area.select();
+    const ok = document.execCommand("copy");
+    area.remove();
+    alert(ok ? "已复制报价内容。" : "自动复制失败，请使用报价单的打印功能。");
+  }
+}
+
+function exportBackup() {
+  const history = readHistory();
+  const blob = new Blob([JSON.stringify(history, null, 2)], {
+    type: "application/json"
+  });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "家具报价备份.json";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
+function importBackup(file) {
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const data = JSON.parse(reader.result);
+      if (!Array.isArray(data) ||
+          !data.every(x => x && x.id && x.result && x.form)) {
+        throw new Error("文件格式不正确");
+      }
+      const existing = readHistory();
+      const map = new Map(existing.map(x => [x.id, x]));
+      for (const item of data) map.set(item.id, item);
+      if (writeHistory(Array.from(map.values()))) {
+        renderHistory();
+        alert("备份导入成功。");
+      }
+    } catch (error) {
+      alert("无法导入：请确认选择的是本计算器导出的 JSON 备份文件。");
+    }
+    $("backupFile").value = "";
+  };
+  reader.readAsText(file);
+}
+
+for (const id of inputIds) {
+  $(id).addEventListener("input", calculate);
+  $(id).addEventListener("change", calculate);
+}
+
+$("saveBtn").addEventListener("click", saveQuote);
+$("quoteBtn").addEventListener("click", () => {
+  const r = calculate();
+  if (r) showQuote(r);
+});
+$("copyBtn").addEventListener("click", () => {
+  const r = calculate();
+  if (r) copyText(makeQuoteText(r));
+});
+$("printBtn").addEventListener("click", () => {
+  if (!calculate()) return;
+  showQuote(lastCalculation);
+  window.print();
+});
+$("exportBtn").addEventListener("click", exportBackup);
+$("importBtn").addEventListener("click", () => $("backupFile").click());
+$("backupFile").addEventListener("change", e => importBackup(e.target.files[0]));
+$("clearBtn").addEventListener("click", () => {
+  if (!confirm("确定清空全部历史报价记录吗？建议先导出备份。")) return;
+  if (writeHistory([])) renderHistory();
+});
+
 calculate();
+renderHistory();
 </script>
 </body>
 </html>
